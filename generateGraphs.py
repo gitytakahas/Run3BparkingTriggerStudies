@@ -110,31 +110,27 @@ def fillGraph(tree, type, sel, gencut, graph, ipt, pt):
     graph.SetPointError(ipt, 0, efferr*sf)
 
 ensureDir('plots/')
-file2read = 'root/genstudy_l1.root'
-
-
+file2read = 'root/genstudy_l1_bugfix.root' # 'root/genstudy_l1.root'
 if options.type == 'rate':
     file2read = 'root/rate_322079_L1p8.root'
-
 sfile = TFile(file2read)
-
 tree = sfile.Get('tree')
 
 hists = []
 titles = []
-
 ptrange = np.arange(3, 11, 1).tolist()
 
+# singleMu triggers 
 graph_singleMu = createGraph('singleMu')
-
 for ipt, pt in enumerate(ptrange):
     sel = 'singleMu' + str(pt) + '==1'
     if options.type=='rate':
         sel = 'mu1_pt >= ' + str(pt)
     fillGraph(tree, options.type, sel, gencut, graph_singleMu, ipt, pt)
 
+# MuEG triggers 
 graphs_MuE = []
-for ipt_mu, pt_mu in enumerate(ptrange):
+for ipt_mu, pt_mu in enumerate([4]): # ptrange
     graph_MuE = createGraph('Mu' + str(pt_mu))
     for ipt_e, pt_e in enumerate(ptrange):
         sel = 'singleMu' + str(pt_mu) + '==1 && (e1_pt >= ' + str(pt_e) + ' || e2_pt >= ' + str(pt_e) + ') '
@@ -143,18 +139,50 @@ for ipt_mu, pt_mu in enumerate(ptrange):
         fillGraph(tree, options.type, sel, gencut, graph_MuE, ipt_e, pt_e)
     graphs_MuE.append(graph_MuE)
 
+# DoubleEG triggers 
 graph_DoubleE_dR = createGraph('DoubleE_dR')
 for ipt_e, pt_e in enumerate(ptrange):
     sel = 'doubleE' + str(pt_e) + '==1'
     fillGraph(tree, options.type, sel, gencut, graph_DoubleE_dR, ipt_e, pt_e)
 
+# MuEE triggers 
+graphs_MuEE = []
+for ipt_mu, pt_mu in enumerate([4]): # ptrange
+    graph_MuEE = createGraph('MuEE' + str(pt_mu))
+    for ipt_e, pt_e in enumerate(ptrange):
+        sel = 'singleMu' + str(pt_mu) + '==1 && doubleE' + str(pt_e) + '==1'
+        if options.type=='rate':
+            sel = 'mu1_pt >= ' + str(pt_mu) + '&& doubleE' + str(pt_e) + '==1'
+        fillGraph(tree, options.type, sel, gencut, graph_MuEE, ipt_e, pt_e)
+    graphs_MuEE.append(graph_MuEE)
+
+# vvvvv NEEDS CHECKING!!
+# MuEE asymm triggers 
+graphs_MuEEa = []
+for ipt_mu, pt_mu in enumerate([4]): # ptrange
+    for ipt_e1, pt_e1 in enumerate(ptrange):
+        name = 'Mu' + str(pt_mu) + 'EEa' + str(pt_e1)
+        graph_MuEEa = createGraph(name)
+        for ipt_e2, pt_e2 in enumerate(ptrange):
+            if ipt_e2 >= ipt_e1 : continue
+            sel = 'singleMu' + str(pt_mu) + '==1 &&' + \
+                  'doubleE' + str(pt_e2) + '==1 && ' + \
+                  '(e1_pt >= ' + str(pt_e1) + ' || e2_pt >= ' + str(pt_e1) + ') '
+            if options.type=='rate':
+                sel = 'mu1_pt >= ' + str(pt_mu) + ' && ' + \
+                      'doubleE' + str(pt_e2) + '==1 && ' + \
+                      'e1_pt >=' + str(pt_e1)
+            fillGraph(tree, options.type, sel, gencut, graph_MuEEa, ipt_e2, pt_e2)
+        graphs_MuEEa.append(graph_MuEEa)
+# ^^^^^^ NEEDS CHECKING!!
+
 out = TFile('plot_' + options.type + '.root', 'recreate')
 
 graph_singleMu.Write()
 graph_DoubleE_dR.Write()
-
-for graph in graphs_MuE:
-    graph.Write()
+for graph in graphs_MuE: graph.Write()
+for graph in graphs_MuEE: graph.Write()
+for graph in graphs_MuEEa: graph.Write()
 
 #############
 
