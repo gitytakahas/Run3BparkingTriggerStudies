@@ -266,7 +266,23 @@ for ii, vkey in enumerate([4]):
 #    graph_singleMuE.SetName('muon p_{T} > ' + str(vkey) + ' GeV')
     graphs_singleMuE.append(copy.deepcopy(graph_singleMuE))
 
+graphs_singleMuEE = []
+for ii, vkey in enumerate([4]):
+    eff_singleMuEE = sfile_eff.Get('MuEE' + str(vkey))
+    rate_singleMuEE = sfile_rate.Get('MuEE' + str(vkey))
+    graph_singleMuEE = returnGraph('MuEE' + str(vkey), eff_singleMuEE, rate_singleMuEE)
+    applyHistStyle(graph_singleMuEE, ii)
+    graphs_singleMuEE.append(copy.deepcopy(graph_singleMuEE))
 
+graphs_singleMuEEa = []
+for ii, vkey in enumerate([4]):
+    for jj, val in enumerate([4,6,8,10]):
+        name = 'Mu' + str(vkey) + 'EEa' + str(val)
+        eff_singleMuEEa = sfile_eff.Get(name)
+        rate_singleMuEEa = sfile_rate.Get(name)
+        graph_singleMuEEa = returnGraph(name, eff_singleMuEEa, rate_singleMuEEa)
+        applyHistStyle(graph_singleMuEEa, ii)
+        graphs_singleMuEEa.append(copy.deepcopy(graph_singleMuEEa))
 
 graphs_DoubleE_dR = []
 
@@ -350,7 +366,8 @@ for graph in graphs_singleMu:
     graph.SetMarkerSize(1)
     graph.Write()
     graph.Draw('plsame')
-    leg.AddEntry(graph, 'Single #mu > X GeV, |#eta| < 1.5', 'lep')
+    #leg.AddEntry(graph, 'Single #mu > X GeV, |#eta| < 1.5', 'lep')
+    leg.AddEntry(graph, 'Mu (4,1.5)', 'lep')
 
 #for graph in graphs_singleMuE:
 #    graph.SetLineColor(2)
@@ -364,7 +381,26 @@ for graph in graphs_singleMuE:
     graph.SetMarkerSize(1)
     graph.Write()
     graph.Draw('plsame')
-    leg.AddEntry(graph, 'mu (p_{T} #geq 4 GeV, #eta < 1.5) + e (p_{T} #geq X GeV, #eta < 1.0)', 'lep')
+    #leg.AddEntry(graph, 'mu (p_{T} #geq 4 GeV, #eta < 1.5) + e (p_{T} #geq X GeV, #eta < 1.0)', 'lep')
+    leg.AddEntry(graph, 'Mu (4,1.5) + E (X,1.0)', 'lep')
+
+for graph in graphs_singleMuEE:
+    graph.SetLineColor(3)
+    graph.SetMarkerColor(3)
+    graph.SetMarkerStyle(25)
+    graph.SetMarkerSize(1)
+    graph.Write()
+    graph.Draw('plsame')
+    leg.AddEntry(graph, 'Mu (4,1.5) + EE (X,1.0;dR<1)', 'lep')
+
+for igraph,graph in enumerate(graphs_singleMuEEa):
+    graph.SetLineColor(6)
+    graph.SetMarkerColor(6)
+    graph.SetMarkerStyle(25)
+    graph.SetMarkerSize(1)
+    graph.Write()
+    graph.Draw('plsame')
+    if igraph == 0 : leg.AddEntry(graph, 'Mu (4,1.5) + E1 (X,1.0)  + E2 (Y,1.0;Y<X)', 'lep')
 
 for graph in graphs_DoubleE_dR:
     graph.SetLineColor(4)
@@ -373,7 +409,8 @@ for graph in graphs_DoubleE_dR:
     graph.SetMarkerSize(1)
     graph.Write()
     graph.Draw('plsame')
-    leg.AddEntry(graph, 'Double e (p_{T} #geq X GeV, #eta < 1.0) + dR < 1', 'lep')
+    #leg.AddEntry(graph, 'Double e (p_{T} #geq X GeV, #eta < 1.0) + dR < 1', 'lep')
+    leg.AddEntry(graph, 'EE (X,1.0;dR<1)', 'lep')
 
 
 leg.Draw()
