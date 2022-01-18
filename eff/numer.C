@@ -92,7 +92,7 @@
   sel += " && analysisBdtO > 8.";                                               // Analysis BT cut
   sel += " && (mll_fullfit*mll_fullfit)>1.1 && (mll_fullfit*mll_fullfit)<6.25"; // Low q2 requirement
 
-  nbins = 13
+  nbins = 13;
   
   TH2F numer_reco("numer_reco","numer_reco",nbins, 0. ,nbins*1., nbins, 0. ,nbins*1.);
   int n1 = t->Draw("tag_pt:probe_pt>>numer_reco",sel.c_str(),"goff");
